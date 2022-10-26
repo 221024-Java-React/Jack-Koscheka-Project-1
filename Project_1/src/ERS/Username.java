@@ -2,26 +2,17 @@ package ERS;
 
 public class Username
 {
-	private String email;
+	private Email email;
 	
-	private boolean isValid(String email)
+	public Username(Email email)
 	{
-		int index = email.indexOf('@');
-		
-		if (index < 0)
-			return false;
-		
-		index = email.indexOf('.', index);
-		
-		return index > 0 && index < email.length();
+		this.email = email;
 	}
 	
-	public Username(String email)
+	@Override
+	public String toString()
 	{
-		if (isValid(email))
-			this.email = email;
-		else
-			System.out.println("Email [" + email + "] Is Invalid. Please Enter A Valid Username.");
+		return this.email.toString();
 	}
 	
 }

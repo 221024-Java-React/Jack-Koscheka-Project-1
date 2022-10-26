@@ -2,16 +2,19 @@ package ERS;
 
 public class Password
 {
-	private String password;
+	private String passwordString;
 	
-	public Password(String password)
+	public Password(String passwordString)
 	{
-		this.password = password;
+		this.passwordString = passwordString;
 	}
 	
 	public boolean equals(Password password)
 	{
-		return this.password.equals(password);
+		if (password == null)
+			return false;
+		else
+			return this.passwordString.equals(password.passwordString);
 	}
 
 }

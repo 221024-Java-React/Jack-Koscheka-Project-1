@@ -4,46 +4,34 @@ public class ERS
 {
 	Database database;
 	
+	ERS()
+	{
+		this.database = new Database();
+	}
+	
 	private void register(Username username, Password password)
 	{
-		User user = this.database.getUser(username);
-		
-		if (user == null)
-		{
-			// TODO add user to list
-		}
-		else
-		{
-			System.out.println("User Already Exists. Please Register A Unique Username.");
-		}
+		this.database.register(username, password);
 	}
 	
 	private User login(Username username, Password password)
 	{
-		User user = this.database.getUser(username);
-		
-		if (user == null)
-		{
-			System.out.println("Username [" + username + "] Does Not Exist. Please Use A Registered Username Or "
-					+ "Register If Account Has Not Yet Been Created");
-			return null;
-		}
-		else if (user.getPassword().equals(password))
-		{
-			System.out.println("Successfully Logged In!");
-			return user;
-		}
-		else
-		{
-			System.out.println("Password Was Incorrect. Please Try Again.");
-			return null;
-		}
+		return this.database.login(username, password);
 	}
 	
 	public static void main(String args[])
 	{
 		ERS ers = new ERS();
 		
-		System.out.println("Hello World!");
+		Email email = new Email("test@gmail.com");
+		Username username = new Username(email);
+		Password password = new Password("password");
+		
+		ers.login(username, password);
+		
+		ers.register(username, password);
+		
+		ers.login(username, null);
+		ers.login(username, password);
 	}
 }
