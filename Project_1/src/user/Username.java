@@ -1,4 +1,4 @@
-package ERS;
+package user;
 
 public class Username
 {

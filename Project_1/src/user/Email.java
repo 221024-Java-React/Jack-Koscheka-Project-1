@@ -1,4 +1,4 @@
-package ERS;
+package user;
 
 public class Email
 {
@@ -21,7 +21,7 @@ public class Email
 		if (isValid(emailString))
 			this.emailString = emailString;
 		else
-			System.out.println("Email [" + emailString.toString() + "] Is Invalid. Please Enter A Valid Email.");
+			System.out.println("Email \"" + emailString.toString() + "\" Is Invalid. Please Enter A Valid Email.");
 	}
 	
 	@Override

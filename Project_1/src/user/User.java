@@ -1,8 +1,8 @@
-package ERS;
+package user;
 
 public class User
 {
-	private enum Role { EMPLOYEE, MANAGER };
+	public enum Role { EMPLOYEE, MANAGER };
 	
 	private Role role;
 	private Password password;
@@ -13,9 +13,10 @@ public class User
 		this.password = password;
 	}
 	
-	public Password getPassword()
-	{
-		return this.password;
-	}
+	public Role getRole() { return this.role; }
+	
+	public Password getPassword() { return this.password; }
+	
+	
 	
 }
