@@ -1,5 +1,7 @@
 package general;
 
+import java.util.List;
+
 import reimbursement_ticket.ReimbursementTicket;
 import user.Email;
 import user.Password;
@@ -25,10 +27,15 @@ public class Main
 		ReimbursementTicket ticket = new ReimbursementTicket(price, description);
 		
 		ers.submitTicket(user, ticket);
+		ers.submitTicket(user, new ReimbursementTicket(new Price("2048.01"), "Basic Request"));
 		
+		final List<ReimbursementTicket> tickets = ers.getTickets(user);
 		
+		System.out.println(tickets.toString());
 		
+		final List<ReimbursementTicket> filteredTickets = ers.getTickets(user, ReimbursementTicket.Status.APPROVED);
 		
+		System.out.println(filteredTickets.toString());
 		
 	}
 }

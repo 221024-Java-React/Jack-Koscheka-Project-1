@@ -58,10 +58,7 @@ public class Price
 		}
 	}
 	
-	public Price(String amount)
-	{
-		set(amount);
-	}
+	public Price(String amount) { set(amount); }
 	
 	public void set(String amount)
 	{
@@ -78,4 +75,7 @@ public class Price
 	public byte getCents() { return this.cents; }
 	
 	public double getAmount() { return ((double) this.dollars) + (this.cents * (1.0 / 100.0)); }
+	
+	@Override
+	public String toString() { return "$" + this.dollars + "." + this.cents; }
 }

@@ -25,10 +25,17 @@ public class ReimbursementTicket
 			this.status = status;
 			break;
 		default:
-			System.err.println("Unable To Set Status To " + status.name().toString());
+			System.err.println("Unable To Set Status To " + status.toString());
 			break;
 		}
 	}
 	
 	public Status getStatus() { return this.status; }
+	
+	@Override
+	public String toString()
+	{
+		return "{ price = " + this.price.toString() + ", description = " + this.description.toString()
+				+ ", status = " + this.status.toString() + " }";
+	}
 }
