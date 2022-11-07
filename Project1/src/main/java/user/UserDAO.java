@@ -14,6 +14,30 @@ public class UserDAO
 	private static UserDAO userDAO;
 	private JDBCConnection connectionUtil;
 	
+	private static int getNextID()
+	{
+		Connection connection = getInstance().connectionUtil.getConnection();
+		
+		int id = 0;
+		
+		String sql = "SELECT MAX(id) FROM users";
+		
+		try
+		{
+			Statement statement = connection.createStatement();
+			
+			ResultSet result = statement.executeQuery(sql);
+			
+			if (result.next())
+				id = result.getInt(1) + 1;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return id;
+	}
+	
 	private UserDAO()
 	{
 		connectionUtil = JDBCConnection.getInstance();
@@ -29,12 +53,14 @@ public class UserDAO
 	
 	public static void addUser(User user)
 	{
+		user.id = getNextID();
+		
 		Connection connection = getInstance().connectionUtil.getConnection();
 		
 		UserInfo userInfo = user.getUserInfo();
 		
-		String sql = "INSERT INTO users (role, email, password) VALUES " + "(" + user.role.ordinal()
-			+ ", '" + userInfo.email + "', '" + userInfo.password + "')";
+		String sql = "INSERT INTO users (id, role, email, password) VALUES " + "(" + user.id + ", "
+				+ user.role.ordinal() + ", '" + userInfo.email + "', '" + userInfo.password + "')";
 		
 		try
 		{
@@ -53,8 +79,8 @@ public class UserDAO
 		
 		Connection connection = getInstance().connectionUtil.getConnection();
 		
-		String sql = "SELECT * FROM users WHERE email = " + userInfo.email.toString()
-				+ " AND password = " + userInfo.password;
+		String sql = "SELECT * FROM users WHERE email = '" + userInfo.email
+				+ "' AND password = '" + userInfo.password + "'";
 		
 		try
 		{

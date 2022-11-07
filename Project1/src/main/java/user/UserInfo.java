@@ -33,4 +33,10 @@ public class UserInfo
 		else
 			return false;
 	}
+	
+	@Override
+	public String toString()
+	{
+		return "{ email = " + this.email.toString() + ", password = " + this.password.toString() + "}";
+	}
 }

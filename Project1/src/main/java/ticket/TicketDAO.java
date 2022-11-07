@@ -17,6 +17,30 @@ public class TicketDAO
 	private static TicketDAO ticketDAO;
 	private JDBCConnection connectionUtil;
 	
+	private static int getNextID()
+	{
+		Connection connection = getInstance().connectionUtil.getConnection();
+		
+		int id = 0;
+		
+		String sql = "SELECT MAX(id) FROM tickets";
+		
+		try
+		{
+			Statement statement = connection.createStatement();
+			
+			ResultSet result = statement.executeQuery(sql);
+			
+			if (result.next())
+				id = result.getInt(1) + 1;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return id;
+	}
+	
 	private TicketDAO()
 	{
 		connectionUtil = JDBCConnection.getInstance();
@@ -41,13 +65,15 @@ public class TicketDAO
 			return;
 		}
 		
+		ticket.id = getNextID();
+		
 		Connection connection = getInstance().connectionUtil.getConnection();
 		
 		final Price price = ticket.price;
 		
-		String sql = "INSERT INTO tickets (userID, status, dollars, cents, description) VALUES "
-				+ "(" + user.getID() + ", " + ticket.status.ordinal() + ", " + price.dollars + ", "
-				+ price.cents + ", '" + ticket.description + "')";
+		String sql = "INSERT INTO tickets (id, userID, status, dollars, cents, description) VALUES "
+				+ "(" + ticket.id + ", " + user.getID() + ", " + ticket.status.ordinal() + ", "
+				+ price.dollars + ", " + price.cents + ", '" + ticket.description + "')";
 		
 		try
 		{
