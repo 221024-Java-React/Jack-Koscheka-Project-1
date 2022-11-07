@@ -1,9 +1,9 @@
-package general;
+package ticket;
 
 public class Price
 {
-	private long dollars;
-	private byte cents;
+	long dollars;
+	byte cents;
 	
 	private int setDollars(String amount)
 	{
@@ -59,6 +59,12 @@ public class Price
 	}
 	
 	public Price(String amount) { set(amount); }
+	
+	public Price(long dollars, byte cents)
+	{
+		this.dollars = dollars;
+		this.cents = cents;
+	}
 	
 	public void set(String amount)
 	{

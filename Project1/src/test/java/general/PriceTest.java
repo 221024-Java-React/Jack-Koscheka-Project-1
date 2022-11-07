@@ -2,6 +2,8 @@ package general;
 
 import org.junit.*;
 
+import ticket.Price;
+
 public class PriceTest
 {	
 	static Price price;

@@ -25,6 +25,17 @@ public class Email
 	}
 	
 	@Override
+	public boolean equals(Object object)
+	{
+		if (object == null || !(object instanceof Email))
+			return false;
+		
+		Email email = (Email) object;
+		
+		return this.emailString.equals(email.emailString);
+	}
+	
+	@Override
 	public String toString()
 	{
 		return this.emailString.toString();
