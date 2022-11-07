@@ -2,18 +2,23 @@ package user;
 
 public class UserInfo
 {
-	Email email;
-	Password password;
+	String email, password;
 	
-	public UserInfo(Email email, Password password)
+	public UserInfo()
+	{
+		this.email = null;
+		this.password = null;
+	}
+	
+	public UserInfo(String email, String password)
 	{
 		this.email = email;
 		this.password = password;
 	}
 	
-	public Email getEmail() { return this.email; }
+	public String getEmail() { return this.email; }
 	
-	public Password getPassword() { return this.password; }
+	public String getPassword() { return this.password; }
 	
 	@Override
 	public boolean equals(Object object)

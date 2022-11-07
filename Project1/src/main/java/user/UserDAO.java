@@ -34,7 +34,7 @@ public class UserDAO
 		UserInfo userInfo = user.getUserInfo();
 		
 		String sql = "INSERT INTO users (role, email, password) VALUES " + "(" + user.role.ordinal()
-			+ ", '" + userInfo.email.toString() + "', '" + userInfo.password.toString() + "')";
+			+ ", '" + userInfo.email + "', '" + userInfo.password + "')";
 		
 		try
 		{
@@ -54,7 +54,7 @@ public class UserDAO
 		Connection connection = getInstance().connectionUtil.getConnection();
 		
 		String sql = "SELECT * FROM users WHERE email = " + userInfo.email.toString()
-				+ " AND password = " + userInfo.password.toString();
+				+ " AND password = " + userInfo.password;
 		
 		try
 		{
@@ -97,9 +97,7 @@ public class UserDAO
 			{
 				// IMPORTANT: JDBC indexes from 1 NOT 0
 				
-				Email email = new Email(result.getString(3));
-				Password password = new Password(result.getString(4));
-				UserInfo userInfo = new UserInfo(email, password);
+				UserInfo userInfo = new UserInfo(result.getString(3), result.getString(4));
 				User user = new User(userInfo);
 				
 				user.id = result.getInt(1);
@@ -119,8 +117,8 @@ public class UserDAO
 	{
 		Connection connection = getInstance().connectionUtil.getConnection();
 		
-		String sql = "DELETE FROM people WHERE email = " + userInfo.email.toString()
-				+ " AND password = " + userInfo.password.toString();
+		String sql = "DELETE FROM people WHERE email = " + userInfo.email
+				+ " AND password = " + userInfo.password;
 		
 		try
 		{
@@ -139,8 +137,8 @@ public class UserDAO
 		
 		UserInfo userInfo = user.userInfo;
 		
-		String sql = "UPDATE users SET role = " + user.role.ordinal() + ", email = '" + userInfo.email.toString()
-				+ "', password = '" + userInfo.password.toString() + "' WHERE id = " + user.id;
+		String sql = "UPDATE users SET role = " + user.role.ordinal() + ", email = '" + userInfo.email
+				+ "', password = '" + userInfo.password + "' WHERE id = " + user.id;
 		
 		try
 		{

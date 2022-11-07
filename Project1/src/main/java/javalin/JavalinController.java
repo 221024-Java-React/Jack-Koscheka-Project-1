@@ -35,7 +35,7 @@ public class JavalinController
 		{
 			// TODO register successful
 			
-			System.out.print(userInfo);
+			System.out.println(userInfo);
 			
 			context.status(201);
 			context.result(controller.objectMapper.writeValueAsString(userInfo));
@@ -43,6 +43,8 @@ public class JavalinController
 		else
 		{
 			// TODO register unsuccessful
+			
+			System.out.println("User Already Exists");
 			
 			context.status(404);
 		}
@@ -60,13 +62,15 @@ public class JavalinController
 		{
 			// TODO login unsuccessful
 			
+			System.out.println("User Does Not Exist");
+			
 			context.status(404);
 		}
 		else
 		{
 			// TODO login successful
 			
-			System.out.print(user);
+			System.out.println("User Found");
 			
 			context.status(201);
 			context.result(controller.objectMapper.writeValueAsString(user));
