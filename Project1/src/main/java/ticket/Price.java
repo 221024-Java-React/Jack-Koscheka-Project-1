@@ -66,6 +66,8 @@ public class Price
 		this.cents = cents;
 	}
 	
+	public Price() { this((long) 0, (byte) 0); }
+	
 	public void set(String amount)
 	{
 		int index = setDollars(amount);

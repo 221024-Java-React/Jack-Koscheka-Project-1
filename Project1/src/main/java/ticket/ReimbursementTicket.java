@@ -5,6 +5,14 @@ public class ReimbursementTicket extends Ticket
 	public final Price price;
 	public final String description;
 	
+	public ReimbursementTicket()
+	{
+		super();
+		
+		this.price = new Price();
+		this.description = "";
+	}
+	
 	public ReimbursementTicket(Price price, String description)
 	{
 		super();

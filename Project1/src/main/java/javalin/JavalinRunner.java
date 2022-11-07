@@ -1,6 +1,7 @@
 package javalin;
 
 import io.javalin.Javalin;
+import ticket.TicketController;
 
 public class JavalinRunner
 {
@@ -14,10 +15,9 @@ public class JavalinRunner
 			});
 		});
 		
-		app.get("/hello", ctx -> ctx.result("Hello World!"));
-		
 		app.post("/user/register", JavalinController.register);
-		app.get("/user/login", JavalinController.login);
+		app.post("/user/login", JavalinController.login);
+		app.post("/employee/reimbursement_ticket/add_request", TicketController.reimbursementRequest);
 		
 		app.start(8192);
 	}

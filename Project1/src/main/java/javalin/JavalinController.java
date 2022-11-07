@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.javalin.http.Handler;
 import service.AuthenticationService;
+import ticket.ReimbursementTicket;
 import user.User;
 import user.UserInfo;
 
@@ -33,20 +34,13 @@ public class JavalinController
 		
 		if (AuthenticationService.register(userInfo))
 		{
-			// TODO register successful
-			
-			System.out.println(userInfo);
-			
 			context.status(201);
-			context.result(controller.objectMapper.writeValueAsString(userInfo));
+			context.result("User \"" + userInfo.getEmail() + "\" Was Successfully Created!");
 		}
 		else
 		{
-			// TODO register unsuccessful
-			
-			System.out.println("User Already Exists");
-			
-			context.status(404);
+			context.status(406);
+			context.result("User For Email \"" + userInfo.getEmail() + "\" Already Exists");
 		}
 	};
 	
@@ -60,19 +54,12 @@ public class JavalinController
 		
 		if (user == null)
 		{
-			// TODO login unsuccessful
-			
-			System.out.println("User Does Not Exist");
-			
 			context.status(404);
+			context.result("No Users Have The Specified Email And Password Combination");
 		}
 		else
 		{
-			// TODO login successful
-			
-			System.out.println("User Found");
-			
-			context.status(201);
+			context.status(200);
 			context.result(controller.objectMapper.writeValueAsString(user));
 		}
 	};

@@ -4,8 +4,8 @@ public abstract class Ticket
 {
 	public enum Status { DENIED, PENDING, APPROVED };
 	
-	int id;
-	int userID;
+	public int id;
+	public int userID;
 	Status status;
 	
 	public Ticket()
@@ -17,15 +17,7 @@ public abstract class Ticket
 	
 	public void setStatus(Status status)
 	{
-		switch (status)
-		{
-		case DENIED: case APPROVED:
-			this.status = status;
-			break;
-		default:
-			System.err.println("Unable To Set Status To " + status.toString());
-			break;
-		}
+		this.status = status;
 	}
 	
 	public Status getStatus() { return this.status; }
