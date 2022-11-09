@@ -1,35 +1,39 @@
 package user;
 
-import exceptions.UserNotManagerException;
-
 public class User
 {
 	public enum Role { EMPLOYEE, MANAGER };
 	
-	int id;
-	Role role;
-	UserInfo userInfo;
+	private int userID;
+	private Role role;
+	private UserInfo userInfo;
 	
-	public User(UserInfo userInfo)
+	// Construct
+	
+	public User() { this(0, new UserInfo()); }
+	
+	public User(int userID, UserInfo userInfo)
 	{
-		this.id = 0;
+		this.userID = userID;
 		this.role = Role.EMPLOYEE;
 		this.userInfo = userInfo;
 	}
 	
-	public int getID() { return this.id; }
+	// Set
+	
+	public void setUserID(int userID) { this.userID = userID; }
+	
+	public void setRole(Role role) { this.role = role; }
+	
+	public void setUserInfo(UserInfo userInfo) { this.userInfo = userInfo; }
+	
+	// Get
+	
+	public int getUserID() { return this.userID; }
 	
 	public Role getRole() { return this.role; }
 	
 	public UserInfo getUserInfo() { return this.userInfo; }
-	
-	public void setRole(User user, Role role) throws UserNotManagerException
-	{
-		if (this.role == Role.MANAGER)
-			user.role = role;
-		else
-			throw new UserNotManagerException();
-	}
 	
 	@Override
 	public boolean equals(Object object)

@@ -2,7 +2,9 @@ package user;
 
 public class UserInfo
 {
-	String email, password;
+	private String email, password;
+	
+	// Construct
 	
 	public UserInfo()
 	{
@@ -15,6 +17,14 @@ public class UserInfo
 		this.email = email;
 		this.password = password;
 	}
+	
+	// Set
+	
+	public void setEmail(String email) { this.email = email; }
+	
+	public void setPassword(String password) { this.password = password; }
+	
+	// Get
 	
 	public String getEmail() { return this.email; }
 	

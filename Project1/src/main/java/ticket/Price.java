@@ -2,8 +2,8 @@ package ticket;
 
 public class Price
 {
-	long dollars;
-	byte cents;
+	private long dollars;
+	private byte cents;
 	
 	private int setDollars(String amount)
 	{
@@ -58,15 +58,25 @@ public class Price
 		}
 	}
 	
+	// Construct
+	
+	public Price(double amount) { set(amount); }
+	
 	public Price(String amount) { set(amount); }
 	
-	public Price(long dollars, byte cents)
-	{
-		this.dollars = dollars;
-		this.cents = cents;
-	}
+	public Price(long dollars, byte cents) { set(dollars, cents); }
 	
 	public Price() { this((long) 0, (byte) 0); }
+	
+	// Set
+	
+	public void set(double amount)
+	{
+		final double floorAmount = Math.floor(amount);
+		
+		this.dollars = (long) floorAmount;
+		this.cents = (byte) ((amount - floorAmount) * 100);
+	}
 	
 	public void set(String amount)
 	{
@@ -77,6 +87,14 @@ public class Price
 		else
 			setCents(amount, index);
 	}
+	
+	public void set(long dollars, byte cents)
+	{
+		this.dollars = dollars;
+		this.cents = cents;
+	}
+	
+	// Get
 	
 	public long getDollars() { return this.dollars; }
 	

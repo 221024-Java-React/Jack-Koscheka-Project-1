@@ -1,10 +1,51 @@
 package javalin;
 
 import io.javalin.Javalin;
-import ticket.TicketController;
+
+import user.UserController;
+import employee.EmployeeController;
+import manager.ManagerController;
 
 public class JavalinRunner
 {
+	private static void addUserControls(Javalin app)
+	{
+		app.post("/user/register", UserController.register);
+		app.post("/user/login", UserController.login);
+		app.get("/user/session", UserController.session);
+		app.post("/user/logout", UserController.logout);
+		app.delete("/user/delete", UserController.delete);
+	}
+	
+	private static void addEmployeeControls(Javalin app)
+	{
+		app.get("/user/tickets", EmployeeController.tickets);
+		app.get("/user/tickets/pending", EmployeeController.pendingTickets);
+		app.get("/user/tickets/denied", EmployeeController.deniedTickets);
+		app.get("/user/tickets/approved", EmployeeController.approvedTickets);
+		app.post("/user/tickets/add", EmployeeController.addTicket);
+		app.delete("/user/tickets/delete", EmployeeController.deleteTicket);
+	}
+	
+	private static void addManagerControls(Javalin app)
+	{
+		app.get("/tickets", ManagerController.tickets);
+		app.get("/tickets/pending", ManagerController.pendingTickets);
+		app.get("/tickets/denied", ManagerController.deniedTickets);
+		app.get("/tickets/approved", ManagerController.approvedTickets);
+		app.patch("/tickets/deny", ManagerController.denyTicket);
+		app.patch("/tickets/approve", ManagerController.approveTicket);
+	}
+	
+	private static void addControls(Javalin app)
+	{
+		addUserControls(app);
+		
+		addEmployeeControls(app);
+		
+		addManagerControls(app);
+	}
+	
 	public static void run()
 	{
 		Javalin app = Javalin.create(config -> {
@@ -15,9 +56,7 @@ public class JavalinRunner
 			});
 		});
 		
-		app.post("/user/register", JavalinController.register);
-		app.post("/user/login", JavalinController.login);
-		app.post("/employee/reimbursement_ticket/add_request", TicketController.reimbursementRequest);
+		addControls(app);
 		
 		app.start(8192);
 	}

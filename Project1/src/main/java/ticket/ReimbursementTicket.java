@@ -2,16 +2,12 @@ package ticket;
 
 public class ReimbursementTicket extends Ticket
 {
-	public final Price price;
-	public final String description;
+	private Price price;
+	private String description;
 	
-	public ReimbursementTicket()
-	{
-		super();
-		
-		this.price = new Price();
-		this.description = "";
-	}
+	// Construct
+	
+	public ReimbursementTicket() { this(new Price(), ""); }
 	
 	public ReimbursementTicket(Price price, String description)
 	{
@@ -20,6 +16,19 @@ public class ReimbursementTicket extends Ticket
 		this.price = price;
 		this.description = description;
 	}
+	
+	// Set
+	
+	public void setPrice(Price price) { this.price = price; }
+	
+	public void setDescription(String description) { this.description = description; }
+	
+	
+	// Get
+	
+	public Price getPrice() { return this.price; }
+	
+	public String getDescription() { return this.description; }
 	
 	@Override
 	public String toString()

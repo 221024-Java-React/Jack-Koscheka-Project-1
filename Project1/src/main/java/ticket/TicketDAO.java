@@ -6,10 +6,8 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
-import user.User;
-import user.UserDAO;
-import user.UserInfo;
 import utility.JDBCConnection;
 
 public class TicketDAO
@@ -17,13 +15,26 @@ public class TicketDAO
 	private static TicketDAO ticketDAO;
 	private JDBCConnection connectionUtil;
 	
+	private TicketDAO()
+	{
+		connectionUtil = JDBCConnection.getInstance();
+	}
+	
+	private static TicketDAO getInstance()
+	{
+		if (ticketDAO == null)
+			ticketDAO = new TicketDAO();
+		
+		return ticketDAO;
+	}
+	
 	private static int getNextID()
 	{
 		Connection connection = getInstance().connectionUtil.getConnection();
 		
 		int id = 0;
 		
-		String sql = "SELECT MAX(id) FROM tickets";
+		String sql = "SELECT MAX(ticketID) FROM tickets";
 		
 		try
 		{
@@ -41,39 +52,48 @@ public class TicketDAO
 		return id;
 	}
 	
-	private TicketDAO()
+	private static List<Ticket> getAllTicketsSQL(String sql)
 	{
-		connectionUtil = JDBCConnection.getInstance();
-	}
-	
-	private static TicketDAO getInstance()
-	{
-		if (ticketDAO == null)
-			ticketDAO = new TicketDAO();
-		
-		return ticketDAO;
-	}
-	
-	public static void addTicket(ReimbursementTicket ticket, UserInfo userInfo)
-	{
-		User user = UserDAO.getUser(userInfo);
-		
-		if (user == null)
-		{
-			// TODO throw user not found exception
-			
-			return;
-		}
-		
-		ticket.id = getNextID();
+		List<Ticket> tickets = new ArrayList<Ticket>();
 		
 		Connection connection = getInstance().connectionUtil.getConnection();
 		
-		final Price price = ticket.price;
+		try
+		{
+			Statement statement = connection.createStatement();
+			
+			ResultSet result = statement.executeQuery(sql);
+			
+			while (result.next())
+			{
+				Price price = new Price((long) result.getInt(4), (byte) result.getInt(5));
+				Ticket ticket = new ReimbursementTicket(price, result.getString(6));
+				
+				ticket.setTicketID(result.getInt(1));
+				ticket.setUserID(result.getInt(2));
+				ticket.setStatus(Ticket.Status.values()[result.getInt(3)]);
+				
+				tickets.add(ticket);
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		
-		String sql = "INSERT INTO tickets (id, userID, status, dollars, cents, description) VALUES "
-				+ "(" + ticket.id + ", " + user.getID() + ", " + ticket.status.ordinal() + ", "
-				+ price.dollars + ", " + price.cents + ", '" + ticket.description + "')";
+		return tickets;
+	}
+	
+	public static void addTicket(ReimbursementTicket ticket)
+	{
+		ticket.setTicketID(getNextID());
+		
+		Connection connection = getInstance().connectionUtil.getConnection();
+		
+		final Price price = ticket.getPrice();
+		
+		String sql = "INSERT INTO tickets (ticketID, userID, status, dollars, cents, description) VALUES "
+				+ "(" + ticket.getTicketID() + ", " + ticket.getUserID() + ", " + ticket.getStatus().ordinal() + ", "
+				+ price.getDollars() + ", " + price.getCents() + ", '" + ticket.getDescription() + "')";
 		
 		try
 		{
@@ -86,90 +106,35 @@ public class TicketDAO
 		}
 	}
 	
-	public static List<Ticket> getAllTickets(Ticket.Status status)
+	public static List<Ticket> getAllTickets(Optional<Integer> userID, Optional<Ticket.Status> status)
 	{
-		List<Ticket> tickets = new ArrayList<Ticket>();
+		StringBuilder stringBuilder = new StringBuilder("SELECT * FROM tickets");
 		
-		Connection connection = getInstance().connectionUtil.getConnection();
-		
-		String sql = "SELECT * FROM tickets WHERE status = " + status.ordinal();
-		
-		try
+		if (userID.isPresent())
 		{
-			Statement statement = connection.createStatement();
+			stringBuilder.append(" WHERE userID = ");
+			stringBuilder.append(userID.get());
 			
-			ResultSet result = statement.executeQuery(sql);
-			
-			while (result.next())
+			if (status.isPresent())
 			{
-				// IMPORTANT: JDBC indexes from 1 NOT 0
-				
-				Price price = new Price((long) result.getInt(4), (byte) result.getInt(5));
-				Ticket ticket = new ReimbursementTicket(price, result.getString(6));
-				
-				ticket.id = result.getInt(1);
-				ticket.userID = result.getInt(2);
-				ticket.status = Ticket.Status.values()[result.getInt(3)];
-				
-				tickets.add(ticket);
+				stringBuilder.append(" AND status = ");
+				stringBuilder.append(status.get().ordinal());
 			}
-			
-		} catch (SQLException e) {
-			e.printStackTrace();
 		}
-		
-		return tickets;
-	}
-	
-	public static List<Ticket> getAllTickets(UserInfo userInfo)
-	{
-		User user = UserDAO.getUser(userInfo);
-		
-		if (user == null)
+		else if (status.isPresent())
 		{
-			// TODO throw user not found exception
-			
-			return null;
+			stringBuilder.append(" WHERE status = ");
+			stringBuilder.append(status.get().ordinal());
 		}
 		
-		List<Ticket> tickets = new ArrayList<Ticket>();
-		
-		Connection connection = getInstance().connectionUtil.getConnection();
-		
-		String sql = "SELECT * FROM tickets WHERE userID = " + user.getID();
-		
-		try
-		{
-			Statement statement = connection.createStatement();
-			
-			ResultSet result = statement.executeQuery(sql);
-			
-			while (result.next())
-			{
-				// IMPORTANT: JDBC indexes from 1 NOT 0
-				
-				Price price = new Price((long) result.getInt(4), (byte) result.getInt(5));
-				Ticket ticket = new ReimbursementTicket(price, result.getString(6));
-				
-				ticket.id = result.getInt(1);
-				ticket.userID = result.getInt(2);
-				ticket.status = Ticket.Status.values()[result.getInt(3)];
-				
-				tickets.add(ticket);
-			}
-			
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
-		return tickets;
+		return getAllTicketsSQL(stringBuilder.toString());
 	}
 	
 	public static void deleteTicket(ReimbursementTicket ticket)
 	{
 		Connection connection = getInstance().connectionUtil.getConnection();
 		
-		String sql = "DELETE FROM tickets WHERE id = " + ticket.id;
+		String sql = "DELETE FROM tickets WHERE ticketID = " + ticket.getTicketID();
 		
 		try
 		{
@@ -186,7 +151,8 @@ public class TicketDAO
 	{
 		Connection connection = getInstance().connectionUtil.getConnection();
 		
-		String sql = "UPDATE users SET status = " + ticket.status.ordinal() + " WHERE id = " + ticket.id;
+		String sql = "UPDATE users SET status = " + ticket.getStatus().ordinal()
+				+ " WHERE ticketID = " + ticket.getTicketID();
 		
 		try
 		{

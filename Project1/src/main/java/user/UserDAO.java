@@ -14,13 +14,26 @@ public class UserDAO
 	private static UserDAO userDAO;
 	private JDBCConnection connectionUtil;
 	
+	private UserDAO()
+	{
+		connectionUtil = JDBCConnection.getInstance();
+	}
+	
+	private static UserDAO getInstance()
+	{
+		if (userDAO == null)
+			userDAO = new UserDAO();
+		
+		return userDAO;
+	}
+	
 	private static int getNextID()
 	{
 		Connection connection = getInstance().connectionUtil.getConnection();
 		
 		int id = 0;
 		
-		String sql = "SELECT MAX(id) FROM users";
+		String sql = "SELECT MAX(userID) FROM users";
 		
 		try
 		{
@@ -38,29 +51,43 @@ public class UserDAO
 		return id;
 	}
 	
-	private UserDAO()
+	private static User getUserResult(ResultSet result) throws SQLException
 	{
-		connectionUtil = JDBCConnection.getInstance();
-	}
-	
-	private static UserDAO getInstance()
-	{
-		if (userDAO == null)
-			userDAO = new UserDAO();
+		UserInfo userInfo = new UserInfo(result.getString(3), result.getString(4));
+		User user = new User(result.getInt(1), userInfo);
+		user.setRole(User.Role.values()[result.getInt(2)]);
 		
-		return userDAO;
+		return user;
 	}
 	
-	public static void addUser(User user)
+	private static User getUserSQL(String sql)
 	{
-		user.id = getNextID();
+		Connection connection = getInstance().connectionUtil.getConnection();
+		
+		try
+		{
+			Statement statement = connection.createStatement();
+			
+			ResultSet result = statement.executeQuery(sql);
+			
+			if (result.next())
+				return getUserResult(result);
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	public static void addUser(UserInfo userInfo)
+	{
+		User user = new User(getNextID(), userInfo);
 		
 		Connection connection = getInstance().connectionUtil.getConnection();
 		
-		UserInfo userInfo = user.getUserInfo();
-		
-		String sql = "INSERT INTO users (id, role, email, password) VALUES " + "(" + user.id + ", "
-				+ user.role.ordinal() + ", '" + userInfo.email + "', '" + userInfo.password + "')";
+		String sql = "INSERT INTO users (userID, role, email, password) VALUES " + "(" + user.getUserID() + ", "
+				+ user.getRole().ordinal() + ", '" + userInfo.getEmail() + "', '" + userInfo.getPassword() + "')";
 		
 		try
 		{
@@ -73,36 +100,20 @@ public class UserDAO
 		}
 	}
 	
+	public static User getUser(int userID)
+	{
+		return getUserSQL("SELECT * FROM users WHERE userID = " + userID);
+	}
+	
+	public static User getUser(String email)
+	{
+		return getUserSQL("SELECT * FROM users WHERE email = '" + email + "'");
+	}
+	
 	public static User getUser(UserInfo userInfo)
 	{
-		User user = null;
-		
-		Connection connection = getInstance().connectionUtil.getConnection();
-		
-		String sql = "SELECT * FROM users WHERE email = '" + userInfo.email
-				+ "' AND password = '" + userInfo.password + "'";
-		
-		try
-		{
-			Statement statement = connection.createStatement();
-			
-			ResultSet result = statement.executeQuery(sql);
-			
-			if (result.next())
-			{
-				// IMPORTANT: JDBC indexes from 1 NOT 0
-				
-				user = new User(userInfo);
-				
-				user.id = result.getInt(1);
-				user.role = User.Role.values()[result.getInt(2)];
-			}
-			
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		
-		return user;
+		return getUserSQL("SELECT * FROM users WHERE email = '" + userInfo.getEmail()
+				+ "' AND password = '" + userInfo.getPassword() + "'");
 	}
 	
 	public static List<User> getAllUsers()
@@ -120,17 +131,7 @@ public class UserDAO
 			ResultSet result = statement.executeQuery(sql);
 			
 			while (result.next())
-			{
-				// IMPORTANT: JDBC indexes from 1 NOT 0
-				
-				UserInfo userInfo = new UserInfo(result.getString(3), result.getString(4));
-				User user = new User(userInfo);
-				
-				user.id = result.getInt(1);
-				user.role = User.Role.values()[result.getInt(2)];
-				
-				users.add(user);
-			}
+				users.add(getUserResult(result));
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -139,12 +140,11 @@ public class UserDAO
 		return users;
 	}
 	
-	public static void deleteUser(UserInfo userInfo)
+	public static boolean deleteUser(int userID)
 	{
 		Connection connection = getInstance().connectionUtil.getConnection();
 		
-		String sql = "DELETE FROM people WHERE email = " + userInfo.email
-				+ " AND password = " + userInfo.password;
+		String sql = "DELETE FROM people WHERE userID = " + userID;
 		
 		try
 		{
@@ -152,19 +152,23 @@ public class UserDAO
 			
 			statement.execute(sql);
 			
+			return true;
+			
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
+		
+		return false;
 	}
 	
 	public static void updateUser(User user)
 	{
 		Connection connection = getInstance().connectionUtil.getConnection();
 		
-		UserInfo userInfo = user.userInfo;
+		UserInfo userInfo = user.getUserInfo();
 		
-		String sql = "UPDATE users SET role = " + user.role.ordinal() + ", email = '" + userInfo.email
-				+ "', password = '" + userInfo.password + "' WHERE id = " + user.id;
+		String sql = "UPDATE users SET role = " + user.getRole().ordinal() + ", email = '" + userInfo.getEmail()
+				+ "', password = '" + userInfo.getPassword() + "' WHERE userID = " + user.getUserID();
 		
 		try
 		{
