@@ -1,10 +1,9 @@
-package javalin;
+package main;
 
 import io.javalin.Javalin;
-
-import user.UserController;
-import employee.EmployeeController;
-import manager.ManagerController;
+import controllers.EmployeeController;
+import controllers.ManagerController;
+import controllers.UserController;
 
 public class JavalinRunner
 {
@@ -35,6 +34,8 @@ public class JavalinRunner
 		app.get("/tickets/approved", ManagerController.approvedTickets);
 		app.patch("/tickets/deny", ManagerController.denyTicket);
 		app.patch("/tickets/approve", ManagerController.approveTicket);
+		app.patch("/user/manager", ManagerController.makeManager);
+		app.patch("/user/employee", ManagerController.makeEmployee);
 	}
 	
 	private static void addControls(Javalin app)

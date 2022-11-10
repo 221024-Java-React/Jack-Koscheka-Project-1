@@ -1,4 +1,4 @@
-package ticket;
+package daos;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -8,6 +8,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import models.Price;
+import models.ReimbursementTicket;
+import models.Ticket;
 import utility.JDBCConnection;
 
 public class TicketDAO
@@ -134,7 +137,13 @@ public class TicketDAO
 	{
 		Connection connection = getInstance().connectionUtil.getConnection();
 		
-		String sql = "DELETE FROM tickets WHERE ticketID = " + ticket.getTicketID();
+		String sql;
+		
+		if (ticket.getTicketID() > 0)
+			sql = "DELETE FROM tickets WHERE ticketID = " + ticket.getTicketID();
+		else
+			sql = "DELETE FROM tickets WHERE dollars = " + ticket.getPrice().getDollars() + " AND cents = "
+				+ ticket.getPrice().getCents() + " AND description = '" + ticket.getDescription() + "'";
 		
 		try
 		{
@@ -151,8 +160,15 @@ public class TicketDAO
 	{
 		Connection connection = getInstance().connectionUtil.getConnection();
 		
-		String sql = "UPDATE users SET status = " + ticket.getStatus().ordinal()
+		String sql;
+		
+		if (ticket.getTicketID() > 0)
+			sql = "UPDATE tickets SET status = " + ticket.getStatus().ordinal()
 				+ " WHERE ticketID = " + ticket.getTicketID();
+		else
+			sql = "UPDATE tickets SET status = " + ticket.getStatus().ordinal() + " WHERE dollars = "
+				+ ticket.getPrice().getDollars() + " AND cents = " + ticket.getPrice().getCents()
+				+ " AND description = '" + ticket.getDescription() + "'";
 		
 		try
 		{

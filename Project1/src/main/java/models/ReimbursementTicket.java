@@ -1,4 +1,4 @@
-package ticket;
+package models;
 
 public class ReimbursementTicket extends Ticket
 {

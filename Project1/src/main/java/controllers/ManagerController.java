@@ -1,13 +1,11 @@
-package manager;
+package controllers;
 
 import java.util.Optional;
 
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
-
-import ticket.Ticket;
-import user.User;
-import user.UserController;
+import models.Ticket;
+import models.User;
 
 public class ManagerController
 {	
@@ -19,6 +17,11 @@ public class ManagerController
 	private static void updateTicket(Context context, Ticket.Status status)
 	{
 		UserController.updateTicket(context, status, User.Role.MANAGER);
+	}
+	
+	private static void updateUser(Context context, User.Role role)
+	{
+		UserController.updateUser(context, role, User.Role.MANAGER);
 	}
 	
 	public static Handler tickets = (context) -> {
@@ -49,6 +52,16 @@ public class ManagerController
 	public static Handler approveTicket = (context) -> {
 		
 		updateTicket(context, Ticket.Status.APPROVED);
+	};
+	
+	public static Handler makeManager = (context) -> {
+		
+		updateUser(context, User.Role.MANAGER);
+	};
+	
+	public static Handler makeEmployee = (context) -> {
+		
+		updateUser(context, User.Role.EMPLOYEE);
 	};
 
 }

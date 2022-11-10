@@ -1,4 +1,4 @@
-package ticket;
+package models;
 
 public abstract class Ticket
 {

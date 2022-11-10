@@ -1,11 +1,14 @@
-package user;
+package services;
 
 import java.util.List;
 import java.util.Optional;
 
-import ticket.ReimbursementTicket;
-import ticket.Ticket;
-import ticket.TicketDAO;
+import daos.TicketDAO;
+import daos.UserDAO;
+import models.ReimbursementTicket;
+import models.Ticket;
+import models.User;
+import models.UserInfo;
 
 public class UserService
 {
@@ -48,7 +51,7 @@ public class UserService
 			case EMPLOYEE:
 				return TicketDAO.getAllTickets(Optional.of(userID), status);
 			case MANAGER:
-				return TicketDAO.getAllTickets(Optional.of(null), status);
+				return TicketDAO.getAllTickets(Optional.empty(), status);
 			default:
 				return null;
 			}
@@ -101,6 +104,23 @@ public class UserService
 			ticket.setStatus(status);
 			
 			TicketDAO.updateTicket(ticket);
+			
+			return true;
+		}
+		else
+			return false;
+	}
+	
+	public static boolean updateUser(int userID, User user, User.Role role,
+			User.Role authorization) throws NullPointerException
+	{
+		User currentUser = UserDAO.getUser(userID);
+		
+		if (currentUser.getRole() == authorization)
+		{
+			user.setRole(role);
+			
+			UserDAO.updateUser(user);
 			
 			return true;
 		}

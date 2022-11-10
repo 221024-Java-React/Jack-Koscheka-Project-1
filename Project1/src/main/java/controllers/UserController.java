@@ -1,13 +1,18 @@
-package user;
+package controllers;
 
 import java.util.List;
 import java.util.Optional;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
-import main.ObjectConverter;
-import ticket.ReimbursementTicket;
-import ticket.Ticket;
+import models.ReimbursementTicket;
+import models.Ticket;
+import models.User;
+import models.UserInfo;
+import services.UserService;
+import utility.ObjectConverter;
 
 public class UserController
 {
@@ -110,6 +115,46 @@ public class UserController
 		} catch (Exception exception) {
 			context.status(401);
 			context.result("Unauthorized to update the specified ticket.");
+		}
+	}
+	
+	public static void updateUser(Context context, User.Role role, User.Role authorization)
+	{
+		if (UserController.unknownSession(context))
+			return;
+		
+		User user = null;
+		
+		boolean nullUser = false;
+		
+		try {
+			user = ObjectConverter.read(context.body(), User.class);
+		} catch (JsonProcessingException exception) {
+			nullUser = true;
+		}
+		
+		if (nullUser)
+		{
+			try {
+				UserInfo userInfo = ObjectConverter.read(context.body(), UserInfo.class);
+				user = new User(0, userInfo);
+				nullUser = false;
+			} catch (JsonProcessingException e) {}
+		}
+		
+		try {
+			
+			if (UserService.updateUser(getUserID(context), user, role, authorization))
+			{
+				context.status(200);
+				context.result("Successfully updated user role!");
+			}
+			else
+				throw new Exception();
+			
+		} catch (Exception exception) {
+			context.status(401);
+			context.result("Unauthorized to update the specified user.");
 		}
 	}
 	

@@ -1,13 +1,11 @@
-package employee;
+package controllers;
 
 import java.util.Optional;
 
 import io.javalin.http.Context;
 import io.javalin.http.Handler;
-
-import ticket.Ticket;
-import user.User;
-import user.UserController;
+import models.Ticket;
+import models.User;
 
 public class EmployeeController
 {

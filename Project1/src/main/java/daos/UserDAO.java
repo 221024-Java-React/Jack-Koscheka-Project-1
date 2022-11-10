@@ -1,4 +1,4 @@
-package user;
+package daos;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -7,6 +7,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
 
+import models.User;
+import models.UserInfo;
 import utility.JDBCConnection;
 
 public class UserDAO
@@ -144,7 +146,7 @@ public class UserDAO
 	{
 		Connection connection = getInstance().connectionUtil.getConnection();
 		
-		String sql = "DELETE FROM people WHERE userID = " + userID;
+		String sql = "DELETE FROM users WHERE userID = " + userID;
 		
 		try
 		{
@@ -167,8 +169,13 @@ public class UserDAO
 		
 		UserInfo userInfo = user.getUserInfo();
 		
-		String sql = "UPDATE users SET role = " + user.getRole().ordinal() + ", email = '" + userInfo.getEmail()
-				+ "', password = '" + userInfo.getPassword() + "' WHERE userID = " + user.getUserID();
+		String sql;
+		
+		if (user.getUserID() > 0)
+			sql = "UPDATE users SET role = " + user.getRole().ordinal() + " WHERE userID = " + user.getUserID();
+		else
+			sql = "UPDATE users SET role = " + user.getRole().ordinal() + " WHERE email = '" + userInfo.getEmail()
+				+ "' AND password = '" + userInfo.getPassword() + "'";
 		
 		try
 		{
