@@ -174,8 +174,7 @@ public class UserDAO
 		if (user.getUserID() > 0)
 			sql = "UPDATE users SET role = " + user.getRole().ordinal() + " WHERE userID = " + user.getUserID();
 		else
-			sql = "UPDATE users SET role = " + user.getRole().ordinal() + " WHERE email = '" + userInfo.getEmail()
-				+ "' AND password = '" + userInfo.getPassword() + "'";
+			sql = "UPDATE users SET role = " + user.getRole().ordinal() + " WHERE email = '" + userInfo.getEmail() + "'";
 		
 		try
 		{
