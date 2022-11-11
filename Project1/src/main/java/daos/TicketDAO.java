@@ -86,6 +86,35 @@ public class TicketDAO
 		return tickets;
 	}
 	
+	private static Ticket getTicketsSQL(String sql)
+	{
+		Ticket ticket = null;
+		
+		Connection connection = getInstance().connectionUtil.getConnection();
+		
+		try
+		{
+			Statement statement = connection.createStatement();
+			
+			ResultSet result = statement.executeQuery(sql);
+			
+			if (result.next())
+			{
+				Price price = new Price((long) result.getInt(4), (byte) result.getInt(5));
+				ticket = new ReimbursementTicket(price, result.getString(6));
+				
+				ticket.setTicketID(result.getInt(1));
+				ticket.setUserID(result.getInt(2));
+				ticket.setStatus(Ticket.Status.values()[result.getInt(3)]);
+			}
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		
+		return ticket;
+	}
+	
 	public static void addTicket(ReimbursementTicket ticket)
 	{
 		ticket.setTicketID(getNextID());
@@ -156,17 +185,39 @@ public class TicketDAO
 		}
 	}
 	
-	public static void updateTicket(ReimbursementTicket ticket)
+	public static boolean updateTicket(ReimbursementTicket ticket, Ticket.Status status)
 	{
 		Connection connection = getInstance().connectionUtil.getConnection();
 		
 		String sql;
 		
+		StringBuilder stringBuilder = new StringBuilder("SELECT * FROM tickets WHERE ");
+		
 		if (ticket.getTicketID() > 0)
-			sql = "UPDATE tickets SET status = " + ticket.getStatus().ordinal()
-				+ " WHERE ticketID = " + ticket.getTicketID();
+		{
+			stringBuilder.append("ticketID = ");
+			stringBuilder.append(ticket.getTicketID());
+		}
 		else
-			sql = "UPDATE tickets SET status = " + ticket.getStatus().ordinal() + " WHERE dollars = "
+		{
+			stringBuilder.append(" WHERE dollars = ");
+			stringBuilder.append(ticket.getPrice().getDollars());
+			stringBuilder.append(" AND cents = ");
+			stringBuilder.append(ticket.getPrice().getCents());
+			stringBuilder.append(" AND description = '");
+			stringBuilder.append(ticket.getDescription());
+			stringBuilder.append("'");
+		}
+		
+		Ticket dataTicket = getTicketsSQL(stringBuilder.toString());
+		
+		if (dataTicket == null || dataTicket.getStatus() != Ticket.Status.PENDING)
+			return false;
+		
+		if (ticket.getTicketID() > 0)
+			sql = "UPDATE tickets SET status = " + status.ordinal() + " WHERE ticketID = " + ticket.getTicketID();
+		else
+			sql = "UPDATE tickets SET status = " + status.ordinal() + " WHERE dollars = "
 				+ ticket.getPrice().getDollars() + " AND cents = " + ticket.getPrice().getCents()
 				+ " AND description = '" + ticket.getDescription() + "'";
 		
@@ -178,6 +229,10 @@ public class TicketDAO
 			
 		} catch (SQLException e) {
 			e.printStackTrace();
+			
+			return false;
 		}
+		
+		return true;
 	}
 }

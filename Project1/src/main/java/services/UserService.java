@@ -100,14 +100,8 @@ public class UserService
 	{
 		User user = UserDAO.getUser(userID);
 		
-		if (user.getRole() == authorization && ticket.getStatus() == Ticket.Status.PENDING)
-		{
-			ticket.setStatus(status);
-			
-			TicketDAO.updateTicket(ticket);
-			
-			return true;
-		}
+		if (user.getRole() == authorization)
+			return TicketDAO.updateTicket(ticket, status);
 		else
 			return false;
 	}
