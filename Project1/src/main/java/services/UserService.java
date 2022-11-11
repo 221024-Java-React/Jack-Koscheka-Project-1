@@ -65,7 +65,8 @@ public class UserService
 	{
 		User user = UserDAO.getUser(userID);
 		
-		if (user.getRole() == authorization)
+		if (user.getRole() == authorization && ticket.getDescription() != null && ticket.getDescription() != ""
+				&& ticket.getPrice().getAmount() > 0.0)
 		{
 			ticket.setUserID(userID);
 			
